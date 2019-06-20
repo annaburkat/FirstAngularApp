@@ -9,7 +9,7 @@
 	<link rel="stylesheet" href="style/style.css">
 </head>
 
-<body ng-controller="mainController as ctrl" ng-class="{design: isDesignCategory(category), python:isPythonCategory(category)}">
+<body ng-controller="mainController as ctrl" ng-class="{design: isDesignCategory(cat), python:isPythonCategory(cat)}">
 	<div class="container" style="padding:50px;">
 		<div class="row">
 			<div class="col-xs-4">
@@ -19,7 +19,7 @@
 			</div>
 			<div class="col-xs-8">
 				<div style="margin: 10px; padding:10px; margin-bottom:50px;">
-					<h1 style="color:#EA738DFF;">{{currentCategory.name}}</h1>
+					<h1 style="color:#EA738DFF;"> {{currentCategory.name}}</h1>
 				</div>
 			</div>
 
@@ -27,29 +27,31 @@
 		<div class="row">
 			<div class="col-xs-6 sidebar">
 				<ul class="nav nav-sidebar">
-					<li ng-repeat="category in categories" ng-class="{'active': isCurrentCategory(category)}" style="background:#CBCE91FF; border:1px solid #EA738DFF; margin: 10px; padding:10px;">
-						<a href="#" ng-click="setCurrentCategory(category);">{{ category.name }}</a>
+					<li ng-repeat="cat in categories" ng-class="{'active': isCurrentCategory(cat)}" style="background:#CBCE91FF; border:1px solid #EA738DFF; margin: 10px; padding:10px;">
+						<a href="#" ng-click="setCurrentCategory(cat);">{{ cat.name }}</a>
 					</li>
 				</ul>
 			</div>
 			<div class="col-xs-6">
-				<div ng-class="{'active-state': isSelectedBookmark(bookmark.id)}" ng-repeat="bookmark in bookmarks | filter:{category:currentCategory.name}" style="background:#EEA47FFF; border:1px solid #00539CFF; margin: 10px; padding:10px;">
-					<a href="{{ bookmark.url }}">{{ bookmark.title }}</a>
+				<div ng-repeat="book in bookmarks | filter:{category:currentCategory.name}" style="background:#EEA47FFF; border:1px solid #00539CFF; margin: 10px; padding:10px;">
+					<a href="{{ book.url }}">{{ book.title }}</a>
 					<hr>
 					<div style="display:flex; flex-direction:row;justify-content:space-between">
-						<button class="btn btn-link" ng-click="setEditedBookmark(bookmark);startEditing();" type="button" style="border: 2px solid #95DBE5FF; background-color:#078282FF; color:white;">
+						<button class="btn btn-link" ng-click="setEditedBookmark(bookmark); startEditing();" type="button" style="border: 2px solid #95DBE5FF; background-color:#078282FF; color:white;">
 							Edit <i class="far fa-edit"></i>
 						</button>
-						<button type="button" name="button" class="btn btn-danger" ng-click="deleteBookmark(bookmark);"><i class="fas fa-times"></i></button>
+						<button type="button" name="button">&times;</button>
 					</div>
 					<br> <br>
 				</div>
 				<br>
 				<!-- CREATING -->
 				<div ng-if="shouldShowCreating();">
-					<button ng-click="startCreating();" class="btn btn-link" type="button" style="border: 2px solid #E3C9CEFF; background-color:#9FC131FF; color:white; margin-left: 12px;">Creat bookmark<i class="fas fa-plus-circle"></i>
+					<button ng-click="startCreating();" class="btn btn-link" type="button" style="border: 2px solid #FF3EA5FF; background-color:#EDFF00FF; color:#00A4CCFF; margin-left: 12px;">
+						Creat bookmark
+						<i class="fas fa-plus-circle"></i>
 					</button>
-					<form class="form-style" ng-show="isCreating" ng-submit="createBookmark(newBookmark)">
+					<form class="create-form form-style" ng-show="isCreating" ng-submit="createBookmark(newBookmark)">
 						<div class="form-group">
 							<label for="newBookmarkTitle">Bookmark Title</label>
 							<input type="text" class="form-control" id="newBookmarkTitle" ng-model="newBookmark.title" required>
@@ -59,38 +61,39 @@
 							<input type="text" class="form-control" id="newBookmarkUrl" ng-model="newBookmark.url" required>
 						</div>
 						<button type="submit" class="btn btn-info btn-lg">Create</button>
-						<button type="button" class="btn btn-default btn-lg pull right" ng-click="cancelCreating();">Cancel</button>
+						<button type="button" class="btn btn-default btn-lg pull right" click="cancelCreating();">Cancel</button>
 					</form>
 				</div>
+				<hr>
 				<!-- EDITING -->
-				<div ng-show="shouldShowEditing();" style="padding: 12px; color:#F6EA7BFF;">
-					<h3>Editing {{editedBookmark.title}}</h3>
-
-					<form class="edited-style" ng-submit="updateBookmark(editedBookmark)">
+				 <div ng-show="shouldShowEditing()">
+					<h4>Editing {{ editedBookmark.title }}</h4>
+					<form class="edit-form form-style" ng-submit="updateBookmark(editedBookmark)" novalidate>
 						<div class="form-group">
 							<label>Bookmark Title</label>
-							<input type="text" class="form-control" ng-model="editedBookmark.title" required>
+							<input type="text" class="form-control" ng-model="editedBookmark.title">
 						</div>
 						<div class="form-group">
 							<label>Bookmark URL</label>
-							<input type="text" class="form-control" ng-model="editedBookmark.url" required>
+							<input type="text" class="form-control" ng-model="editedBookmark.url">
 						</div>
 						<button type="submit" class="btn btn-info btn-lg">Save</button>
 						<button type="button" class="btn btn-default btn-lg pull right" ng-click="cancelEditing();">Cancel</button>
 					</form>
 				</div>
-				<hr>
 			</div>
 		</div>
 
 
 	</div>
 
-	<script src="jquery.js"></script>
+
+	<script src="https://code.jquery.com/jquery-3.4.1.js" integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU=" crossorigin="anonymous"></script>
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.11/lodash.core.js"></script>
+	<!-- Latest compiled and minified JavaScript -->
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
-	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.11/lodash.js"></script>
-	<script type="text/javascript" src="angularjs.js"></script>
-	<script type="text/javascript" src="app/eggly.js"></script>
+	<script src="angularjs.js"></script>
+	<script src="app/eggly.js"></script>
 </body>
 
 </html>
