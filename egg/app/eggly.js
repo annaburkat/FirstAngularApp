@@ -71,8 +71,14 @@ angular.module('eggly', [])
 
 		$scope.currentCategory = null;
 
-		function setCurrentCategory(category){
+		function setCurrentCategory(category) {
 			$scope.currentCategory = category;
+
+			// $scope.isCreating = false;
+			// $scope.isEditing = false;
+
+			cancelCreating();
+			cancelEditing();
 		};
 
 		function isCurrentCategory(category) {
@@ -83,10 +89,120 @@ angular.module('eggly', [])
 			return $scope.currentCategory !== null && $scope.currentCategory.name == "Design";
 		}
 
+		function isPythonCategory(category) {
+			return $scope.currentCategory !== null && $scope.currentCategory.name == "Python";
+		}
+
 		//making function public
 		$scope.setCurrentCategory = setCurrentCategory;
-
 		$scope.isCurrentCategory = isCurrentCategory;
-
 		$scope.isDesignCategory = isDesignCategory;
-	})
+		$scope.isPythonCategory = isPythonCategory;
+
+
+		////////creating and editing states///////////
+		$scope.isCreating = false;
+		$scope.isEditing = false;
+
+		function startCreating() {
+			$scope.isCreating = true;
+			$scope.isEditing = false;
+
+			resetCreateForm();
+		}
+
+		function cancelCreating() {
+			$scope.isCreating = false;
+		}
+
+		function startEditing() {
+			$scope.isCreating = false;
+			$scope.isEditing = true;
+
+		}
+
+		function cancelEditing() {
+			$scope.isEditing = false;
+
+			$scope.editedBookmark = null;
+		}
+
+		function shouldShowCreating() {
+			return $scope.currentCategory && !$scope.isEditing;
+		}
+
+		function shouldShowEditing() {
+			return $scope.isEditing && !$scope.isCreating;
+		}
+
+		//making function public
+		$scope.startCreating = startCreating;
+		$scope.cancelCreating = cancelCreating;
+		$scope.startEditing = startEditing;
+		$scope.cancelEditing = cancelEditing;
+		$scope.shouldShowEditing = shouldShowEditing;
+		$scope.shouldShowCreating = shouldShowCreating;
+
+
+		//////crud - create, update, delete////////////
+		//take a new bookmark and set to default state
+		function resetCreateForm() {
+			$scope.newBookmark = {
+				id: '',
+				title: '',
+				url: '',
+				category: $scope.currentCategory.name
+			}
+		};
+
+		function createBookmark(bookmark) {
+			bookmark.id = $scope.bookmarks.length;
+			$scope.bookmarks.push(bookmark);
+
+			resetCreateForm();
+		}
+
+		//making function public
+		$scope.createBookmark = createBookmark;
+
+
+		///////update/////////
+		$scope.editedBookmark = null;
+
+		function setEditedBookmark(bookmark) {
+			$scope.editedBookmark = angular.copy(bookmark);
+		}
+
+		function updateBookmark(bookmark) {
+			var index = _.findIndex($scope.bookmarks, function(b){
+				return b.id == bookmark.id;
+			});
+
+			$scope.bookmarks[index] = bookmark;
+
+			$scope.editedBookmark = null;
+			$scope.isEditing = false;
+		}
+
+		function isSelectedBookmark(bookmarkId) {
+			return $scope.editedBookmark !== null && $scope.editedBookmark.id == bookmarkId;
+		}
+
+
+		$scope.setEditedBookmark = setEditedBookmark;
+		$scope.updateBookmark = updateBookmark;
+		$scope.isSelectedBookmark = isSelectedBookmark;
+
+
+
+		////delete////
+		function deleteBookmark(bookmark) {
+			_.remove($scope.bookmarks, function(o) {
+				return o.id == bookmark.id;
+			});
+		}
+
+
+		$scope.deleteBookmark = deleteBookmark;
+
+	});
